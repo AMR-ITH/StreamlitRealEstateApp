@@ -67,7 +67,7 @@ def load_preprocessor():
             return joblib.load(BytesIO(response.content))
         else:
             # Fallback to local file
-            local_path = "models/preprocessor.joblib"
+            local_path = "datasets/preprocessor.joblib"
             if os.path.exists(local_path):
                 return joblib.load(local_path)
             else:
