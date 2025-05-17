@@ -320,8 +320,7 @@ with tab2:
         showscale=True,
         colorbar=dict(title="Price per sqft")
         ),
-            opacity=0.8  # Add transparency to reduce visual clutter
-        ),
+            opacity=0.8 ,
         text=[f"Location: {loc}<br>Price: ₹{price:,.2f}Cr<br>Area: {area} sqft<br>Price/sqft: ₹{ppsqft:,.2f}" 
               for loc, price, area, ppsqft in zip(
                   filtered_df['apartment_loc'], 
