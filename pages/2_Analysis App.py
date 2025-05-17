@@ -311,16 +311,16 @@ with tab2:
         lat=filtered_df['Latitude'],
         lon=filtered_df['Longitude'],
         mode='markers',
-                    marker=dict(
-        size=filtered_df['bulit_area']/100,
-        sizemode='area',
-        sizeref=0.1,
-        color=filtered_df['price_per_sqft'],
-        colorscale='IceFire',
-        showscale=True,
-        colorbar=dict(title="Price per sqft")
+        marker=dict(
+            size=filtered_df['bulit_area'] / 100,
+            sizemode='area',
+            sizeref=0.1,
+            color=filtered_df['price_per_sqft'],
+            colorscale='IceFire',
+            showscale=True,
+            colorbar=dict(title="Price per sqft")
         ),
-            opacity=0.8 ,
+        opacity=0.8,
         text=[f"Location: {loc}<br>Price: ₹{price:,.2f}Cr<br>Area: {area} sqft<br>Price/sqft: ₹{ppsqft:,.2f}" 
               for loc, price, area, ppsqft in zip(
                   filtered_df['apartment_loc'], 
@@ -397,20 +397,6 @@ with tab2:
             showlegend=False
         ))
     
-    # Create custom buttons for zoom control
-    zoom_buttons = [
-        dict(
-            args=[{"mapbox.zoom": 10}],
-            label="Zoom Out",
-            method="relayout"
-        ),
-        dict(
-            args=[{"mapbox.zoom": 12}],
-            label="Zoom In",
-            method="relayout"
-        )
-    ]
-    
     # Update layout with improved styling
     fig.update_layout(
         mapbox=dict(
@@ -427,22 +413,7 @@ with tab2:
             xanchor="right",
             x=1,
             bgcolor="rgba(255,255,255,0.8)"
-        ),
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="right",
-                buttons=zoom_buttons,
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.05,
-                xanchor="left",
-                y=0.05,
-                yanchor="bottom",
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="rgba(0,0,0,0.2)"
-            )
-        ]
+        )
     )
     
     # Display the map
@@ -451,4 +422,5 @@ with tab2:
         'scrollZoom': True,
         'modeBarButtonsToRemove': ['lasso2d', 'select2d']
     })
+
 
