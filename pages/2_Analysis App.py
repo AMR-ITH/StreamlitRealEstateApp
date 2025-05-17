@@ -311,16 +311,15 @@ with tab2:
         lat=filtered_df['Latitude'],
         lon=filtered_df['Longitude'],
         mode='markers',
-                marker=dict(
-            size=filtered_df['bulit_area']/100,
-            sizemode='area',
-            sizeref=0.1,  # Keep this value for better sizing
-            color=filtered_df['price_per_sqft'],
-            colorscale='Plasma',  # Changed to better colorscale
-            showscale=True,
-            colorbar=dict(
-                title="Price per sqft"
-            ),
+                    marker=dict(
+        size=filtered_df['bulit_area']/100,
+        sizemode='area',
+        sizeref=0.1,
+        color=filtered_df['price_per_sqft'],
+        colorscale='IceFire',
+        showscale=True,
+        colorbar=dict(title="Price per sqft")
+        ),
             opacity=0.8  # Add transparency to reduce visual clutter
         ),
         text=[f"Location: {loc}<br>Price: ₹{price:,.2f}Cr<br>Area: {area} sqft<br>Price/sqft: ₹{ppsqft:,.2f}" 
