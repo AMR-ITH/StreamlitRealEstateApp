@@ -303,219 +303,157 @@ with tab2:
         # Map visualization
     st.markdown("<h3 class='sub-header'>Property Map with Price and Area Visualization</h3>", unsafe_allow_html=True)
     
-    # Map visualization
-    def create_property_map(filtered_df):
-        st.markdown("<h3 class='sub-header' style='text-align:center; margin-bottom:20px; color:#2C3E50;'>Property Map with Price and Area Visualization</h3>", unsafe_allow_html=True)
+    # Create figure
+    fig = go.Figure()
+    
+    # Add scatter points for properties
+    fig.add_trace(go.Scattermapbox(
+        lat=filtered_df['Latitude'],
+        lon=filtered_df['Longitude'],
+        mode='markers',
+        marker=dict(
+            size=filtered_df['bulit_area']/100,
+            sizemode='area',
+            sizeref=0.1,  # Keep this value for better sizing
+            color=filtered_df['price_per_sqft'],
+            colorscale='Plasma',  # Changed to better colorscale
+            showscale=True,
+            colorbar=dict(
+                title="Price per sqft",
+                titleside="right",
+                thickness=15
+            ),
+            opacity=0.8  # Add transparency to reduce visual clutter
+        ),
+        text=[f"Location: {loc}<br>Price: ₹{price:,.2f}Cr<br>Area: {area} sqft<br>Price/sqft: ₹{ppsqft:,.2f}" 
+              for loc, price, area, ppsqft in zip(
+                  filtered_df['apartment_loc'], 
+                  filtered_df['price_value'], 
+                  filtered_df['bulit_area'], 
+                  filtered_df['price_per_sqft'])],
+        hoverinfo='text',
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12
+        ),
+        name='Properties'
+    ))
+    
+    # Define zone boundaries with proper formatting
+    zones = [
+        {
+            'name': 'North Bangalore',
+            'coords': [[77.50, 13.17], [77.66, 13.14], [77.66, 13.03], [77.50, 13.03], [77.50, 13.17]],
+            'color': 'rgba(25, 118, 210, 0.9)',  # More vibrant blue
+            'fill': 'rgba(25, 118, 210, 0.15)',
+            'center': [13.10, 77.58]
+        }, 
+        {
+            'name': 'South Bangalore',
+            'coords': [[77.52, 12.93], [77.68, 12.93], [77.68, 12.87], [77.52, 12.87], [77.52, 12.93]],
+            'color': 'rgba(255, 145, 0, 0.9)',  # More vibrant orange
+            'fill': 'rgba(255, 145, 0, 0.15)',
+            'center': [12.90, 77.60]
+        }, 
+        {
+            'name': 'East Bangalore',
+            'coords': [[77.60, 13.02], [77.75, 13.02], [77.75, 12.92], [77.60, 12.92], [77.60, 13.02]],
+            'color': 'rgba(142, 36, 170, 0.9)',  # More vibrant purple
+            'fill': 'rgba(142, 36, 170, 0.15)',
+            'center': [12.97, 77.67]
+        }, 
+        {
+            'name': 'West Bangalore',
+            'coords': [[77.45, 13.02], [77.60, 13.02], [77.60, 12.92], [77.45, 12.92], [77.45, 13.02]],
+            'color': 'rgba(0, 150, 136, 0.9)',  # Teal instead of another blue shade
+            'fill': 'rgba(0, 150, 136, 0.15)',
+            'center': [12.96, 77.53]
+        }
+    ]
+    
+    # Add zone boundaries to map
+    for zone in zones:
+        # Ensure coordinates are properly formatted for plotting a polygon
+        lons = [coord[0] for coord in zone['coords']]
+        lats = [coord[1] for coord in zone['coords']]
         
-        # Create figure
-        fig = go.Figure()
+        # Close the polygon by adding the first point at the end
+        lons.append(lons[0])
+        lats.append(lats[0])
         
-        # Calculate better marker sizing - prevent excessive large circles
-        max_size = max(filtered_df['bulit_area'])
-        size_ref = max_size / 5000  # Adjusted size reference for better scaling
-        
-        # Add scatter points for properties with improved styling
         fig.add_trace(go.Scattermapbox(
-            lat=filtered_df['Latitude'],
-            lon=filtered_df['Longitude'],
-            mode='markers',
-            marker=dict(
-                size=filtered_df['bulit_area']/100,
-                sizemode='area',
-                sizeref=size_ref,  # Better size reference
-                color=filtered_df['price_per_sqft'],
-                colorscale='Plasma',  # More distinct colorscale
-                showscale=True,
-                colorbar=dict(
-                    title="Price per sqft (₹)",
-                    titleside="right",
-                    titlefont=dict(size=12),
-                    thickness=15,
-                    len=0.7,
-                    outlinewidth=1
-                ),
-                opacity=0.8  # Add some transparency to reduce visual clutter
-            ),
-            text=[f"<b>{loc}</b><br>Price: ₹{price:,.2f} Cr<br>Area: {area:,} sqft<br>Price/sqft: ₹{ppsqft:,.2f}" 
-                  for loc, price, area, ppsqft in zip(
-                      filtered_df['apartment_loc'], 
-                      filtered_df['price_value'], 
-                      filtered_df['bulit_area'], 
-                      filtered_df['price_per_sqft'])],
-            hoverinfo='text',
-            hoverlabel=dict(
-                bgcolor="white",
-                font_size=12,
-                font_family="Arial"
-            ),
-            name='Properties'
+            lat=lats,
+            lon=lons,
+            mode='lines',
+            fill='toself',
+            fillcolor=zone['fill'],
+            line=dict(color=zone['color'], width=2.5),  # Slightly thicker line
+            name=zone['name']
         ))
         
-        # Define zone boundaries with proper formatting and improved colors
-        zones = [
-            {
-                'name': 'North Bangalore',
-                'coords': [[77.50, 13.17], [77.66, 13.14], [77.66, 13.03], [77.50, 13.03], [77.50, 13.17]],
-                'color': 'rgba(25, 118, 210, 0.9)',  # More vibrant blue
-                'fill': 'rgba(25, 118, 210, 0.15)',
-                'center': [13.10, 77.58]
-            }, 
-            {
-                'name': 'South Bangalore',
-                'coords': [[77.52, 12.93], [77.68, 12.93], [77.68, 12.87], [77.52, 12.87], [77.52, 12.93]],
-                'color': 'rgba(255, 145, 0, 0.9)',  # More vibrant orange
-                'fill': 'rgba(255, 145, 0, 0.15)',
-                'center': [12.90, 77.60]
-            }, 
-            {
-                'name': 'East Bangalore',
-                'coords': [[77.60, 13.02], [77.75, 13.02], [77.75, 12.92], [77.60, 12.92], [77.60, 13.02]],
-                'color': 'rgba(142, 36, 170, 0.9)',  # More vibrant purple
-                'fill': 'rgba(142, 36, 170, 0.15)',
-                'center': [12.97, 77.67]
-            }, 
-            {
-                'name': 'West Bangalore',
-                'coords': [[77.45, 13.02], [77.60, 13.02], [77.60, 12.92], [77.45, 12.92], [77.45, 13.02]],
-                'color': 'rgba(0, 150, 136, 0.9)',  # Teal instead of another blue
-                'fill': 'rgba(0, 150, 136, 0.15)',
-                'center': [12.96, 77.53]
-            }
-        ]
-        
-        # Add zone boundaries to map
-        for zone in zones:
-            # Ensure coordinates are properly formatted for plotting a polygon
-            lons = [coord[0] for coord in zone['coords']]
-            lats = [coord[1] for coord in zone['coords']]
-            
-            # Close the polygon by adding the first point at the end
-            lons.append(lons[0])
-            lats.append(lats[0])
-            
-            # Add zone boundary
-            fig.add_trace(go.Scattermapbox(
-                lat=lats,
-                lon=lons,
-                mode='lines',
-                fill='toself',
-                fillcolor=zone['fill'],
-                line=dict(color=zone['color'], width=3),  # Thicker line for better visibility
-                name=zone['name']
-            ))
-            
-            # Add zone labels with improved styling
-            fig.add_trace(go.Scattermapbox(
-                lat=[zone['center'][0]],
-                lon=[zone['center'][1]],
-                mode='text',
-                text=[zone['name']],
-                textfont=dict(
-                    size=16, 
-                    color='black',
-                    family="Arial Black"
-                ),
-                textposition="middle center",
-                texttemplate="<b>{text}</b>",  # Make text bold
-                showlegend=False
-            ))
-        
-        # Add a small legend explaining the bubble size
-        fig.add_annotation(
-            x=0.01,
-            y=0.01,
-            xref="paper",
-            yref="paper",
-            text="Bubble size represents property area",
-            showarrow=False,
-            font=dict(size=10, color="black"),
-            align="left",
-            bgcolor="rgba(255,255,255,0.8)",
-            bordercolor="rgba(0,0,0,0.3)",
-            borderwidth=1,
-            borderpad=4,
-            opacity=0.8
+        # Add zone labels
+        fig.add_trace(go.Scattermapbox(
+            lat=[zone['center'][0]],
+            lon=[zone['center'][1]],
+            mode='text',
+            text=[zone['name']],
+            textfont=dict(size=14, color='black', family="Arial Black"),
+            textposition="middle center",
+            showlegend=False
+        ))
+    
+    # Create custom buttons for zoom control
+    zoom_buttons = [
+        dict(
+            args=[{"mapbox.zoom": 10}],
+            label="Zoom Out",
+            method="relayout"
+        ),
+        dict(
+            args=[{"mapbox.zoom": 12}],
+            label="Zoom In",
+            method="relayout"
         )
-        
-        # Create custom buttons for zoom control with better styling
-        zoom_buttons = [
+    ]
+    
+    # Update layout with improved styling
+    fig.update_layout(
+        mapbox=dict(
+            style="carto-positron",  # A cleaner map style
+            center=dict(lat=12.97, lon=77.58),  # Better centered on Bangalore
+            zoom=11
+        ),
+        height=700,
+        margin=dict(l=0, r=0, t=0, b=0),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            bgcolor="rgba(255,255,255,0.8)"
+        ),
+        updatemenus=[
             dict(
-                args=[{"mapbox.zoom": 11}],  # Default zoom
-                label="Default Zoom",
-                method="relayout"
-            ),
-            dict(
-                args=[{"mapbox.zoom": 12}],  # Zoom in
-                label="Zoom In",
-                method="relayout"
-            ),
-            dict(
-                args=[{"mapbox.zoom": 10}],  # Zoom out
-                label="Zoom Out",
-                method="relayout"
+                type="buttons",
+                direction="right",
+                buttons=zoom_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.05,
+                xanchor="left",
+                y=0.05,
+                yanchor="bottom",
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="rgba(0,0,0,0.2)"
             )
         ]
-        
-        # Update layout with improved styling
-        fig.update_layout(
-            mapbox=dict(
-                style="carto-positron",  # Clean map style
-                center=dict(lat=12.97, lon=77.58),  # Centered on Bangalore
-                zoom=11
-            ),
-            height=750,  # Taller map
-            margin=dict(l=0, r=0, t=10, b=0),
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="rgba(0,0,0,0.2)",
-                borderwidth=1
-            ),
-            updatemenus=[
-                dict(
-                    type="buttons",
-                    direction="right",
-                    buttons=zoom_buttons,
-                    pad={"r": 10, "t": 10},
-                    showactive=True,
-                    x=0.05,
-                    xanchor="left",
-                    y=0.05,
-                    yanchor="bottom",
-                    bgcolor="rgba(255,255,255,0.9)",
-                    bordercolor="rgba(0,0,0,0.3)",
-                    font=dict(size=12)
-                )
-            ]
-        )
-        
-        # Display the map with improved configuration
-        st.plotly_chart(fig, use_container_width=True, config={
-            'displayModeBar': True,
-            'scrollZoom': True,
-            'modeBarButtonsToRemove': ['lasso2d', 'select2d'],
-            'toImageButtonOptions': {
-                'format': 'png',
-                'filename': 'bangalore_property_map',
-                'height': 800,
-                'width': 1200,
-                'scale': 2
-            }
-        })
-        
-        # Add filter summary below map
-        with st.expander("Map Details", expanded=False):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total Properties", f"{len(filtered_df)}")
-            with col2:
-                st.metric("Avg Price/sqft", f"₹{filtered_df['price_per_sqft'].mean():,.2f}")
-            with col3:
-                st.metric("Avg Property Size", f"{filtered_df['bulit_area'].mean():,.0f} sqft")
-                
-            st.write("**Property Distribution by Zone:**")
+    )
+    
+    # Display the map
+    st.plotly_chart(fig, use_container_width=True, config={
+        'displayModeBar': True,
+        'scrollZoom': True,
+        'modeBarButtonsToRemove': ['lasso2d', 'select2d']
+    })
 
