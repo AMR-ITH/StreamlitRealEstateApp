@@ -311,7 +311,7 @@ with tab2:
         lat=filtered_df['Latitude'],
         lon=filtered_df['Longitude'],
         mode='markers',
-        marker=dict(
+                marker=dict(
             size=filtered_df['bulit_area']/100,
             sizemode='area',
             sizeref=0.1,  # Keep this value for better sizing
@@ -319,9 +319,7 @@ with tab2:
             colorscale='Plasma',  # Changed to better colorscale
             showscale=True,
             colorbar=dict(
-                title="Price per sqft",
-                titleside="right",
-                thickness=15
+                title="Price per sqft"
             ),
             opacity=0.8  # Add transparency to reduce visual clutter
         ),
@@ -333,8 +331,7 @@ with tab2:
                   filtered_df['price_per_sqft'])],
         hoverinfo='text',
         hoverlabel=dict(
-            bgcolor="white",
-            font_size=12
+            bgcolor="white"
         ),
         name='Properties'
     ))
