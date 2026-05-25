@@ -160,9 +160,9 @@ if predict_button:
 
         try:
 
-            # -----------------------------
+            # -----------------------------------
             # CREATE INPUT DATAFRAME
-            # -----------------------------
+            # -----------------------------------
             input_data = pd.DataFrame({
 
                 "zone": [zone],
@@ -180,9 +180,9 @@ if predict_button:
                 ]
             })
 
-            # -----------------------------
+            # -----------------------------------
             # LOAD PREPROCESSOR
-            # -----------------------------
+            # -----------------------------------
             preprocessor = load_preprocessor()
 
             if preprocessor is None:
@@ -193,16 +193,16 @@ if predict_button:
 
                 st.stop()
 
-            # -----------------------------
+            # -----------------------------------
             # TRANSFORM INPUT
-            # -----------------------------
+            # -----------------------------------
             preprocessed_input = preprocessor.transform(
                 input_data
             )
 
-            # -----------------------------
+            # -----------------------------------
             # LOAD TRAINED MODEL
-            # -----------------------------
+            # -----------------------------------
             model = load_model()
 
             if model is None:
@@ -213,9 +213,9 @@ if predict_button:
 
                 st.stop()
 
-            # -----------------------------
+            # -----------------------------------
             # REAL ML PREDICTION
-            # -----------------------------
+            # -----------------------------------
             prediction = model.predict(
                 preprocessed_input
             )
@@ -242,11 +242,11 @@ if predict_button:
             st.success("Prediction Complete!")
 
             st.markdown(
-                f"## Estimated Price: ₹{predicted_price:,.2f}"
+                f"## Estimated Price: ₹ {predicted_price:.2f} Cr"
             )
 
             st.markdown(
-                f"### Price Range: ₹{lower_bound:,.2f} - ₹{upper_bound:,.2f}"
+                f"### Price Range: ₹ {lower_bound:.2f} Cr - ₹ {upper_bound:.2f} Cr"
             )
 
         except Exception as e:
