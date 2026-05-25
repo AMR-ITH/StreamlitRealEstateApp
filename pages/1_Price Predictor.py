@@ -49,6 +49,40 @@ def load_preprocessor():
 
 
 # -----------------------------------
+# LOAD MODEL
+# -----------------------------------
+@st.cache_resource
+def load_model():
+
+    try:
+
+        url = "https://raw.githubusercontent.com/AMR-ITH/BLRApartmentAnalyzer/development/models/model.joblib"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+
+            model = joblib.load(
+                BytesIO(response.content)
+            )
+
+            return model
+
+        else:
+            raise FileNotFoundError(
+                "Model file not found"
+            )
+
+    except Exception as e:
+
+        st.error(
+            f"Error loading model: {str(e)}"
+        )
+
+        return None
+
+
+# -----------------------------------
 # TITLE
 # -----------------------------------
 st.title("Bangalore Real Estate Price Predictor")
@@ -166,39 +200,27 @@ if predict_button:
                 input_data
             )
 
-            # -----------------------------------
-            # SIMPLE DEMO PREDICTION LOGIC
-            # -----------------------------------
-            base_price = 5000
+            # -----------------------------
+            # LOAD TRAINED MODEL
+            # -----------------------------
+            model = load_model()
 
-            zone_multipliers = {
-                "east": 0.9,
-                "west": 1.1,
-                "north": 1.0,
-                "south": 1.2
-            }
+            if model is None:
 
-            facility_multipliers = {
-                "low": 0.85,
-                "medium": 1.0,
-                "high": 1.3
-            }
+                st.error(
+                    "Unable to load trained model."
+                )
 
-            bhk_adder = bhk * 100000
+                st.stop()
 
-            predicted_price = (
+            # -----------------------------
+            # REAL ML PREDICTION
+            # -----------------------------
+            prediction = model.predict(
+                preprocessed_input
+            )
 
-                base_price *
-
-                built_up_area *
-
-                zone_multipliers[zone] *
-
-                facility_multipliers[
-                    facility_category
-                ]
-
-            ) + bhk_adder
+            predicted_price = prediction[0]
 
             # -----------------------------------
             # PRICE RANGE
