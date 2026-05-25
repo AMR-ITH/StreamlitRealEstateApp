@@ -19,11 +19,30 @@ st.set_page_config(
 def load_preprocessor():
 
     try:
-        preprocessor = joblib.load("preprocessor.joblib")
-        return preprocessor
+
+        url = "https://raw.githubusercontent.com/AMR-ITH/BLRApartmentAnalyzer/development/models/preprocessor.joblib"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+
+            preprocessor = joblib.load(
+                BytesIO(response.content)
+            )
+
+            return preprocessor
+
+        else:
+            raise FileNotFoundError(
+                "Preprocessor file not found"
+            )
 
     except Exception as e:
-        st.error(f"Error loading preprocessor: {str(e)}")
+
+        st.error(
+            f"Error loading preprocessor: {str(e)}"
+        )
+
         return None
 
 
